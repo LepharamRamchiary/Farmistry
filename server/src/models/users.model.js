@@ -110,8 +110,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.index({ email: 1 });
-userSchema.index({ mobileNumber: 1 });
+// Only define indexes explicitly here (remove the duplicate userSchema.index() calls)
+// The unique: true in the schema already creates indexes, so we don't need to duplicate them
 userSchema.index({ "refreshTokens.token": 1 });
 
 userSchema.virtual('isLocked').get(function() {
@@ -222,6 +222,7 @@ userSchema.methods.resetLoginAttempts = async function() {
     $unset: { loginAttempts: 1, lockUntil: 1 }
   });
 };
+
 userSchema.methods.generatePasswordResetToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
   
@@ -268,4 +269,3 @@ userSchema.methods.cleanupExpiredTokens = async function() {
 };
 
 export const User = mongoose.model("User", userSchema);
-
